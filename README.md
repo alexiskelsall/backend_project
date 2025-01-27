@@ -1,9 +1,23 @@
 # Northcoders News API
 
-For instructions, please head over to [L2C NC News](https://l2c.northcoders.com/courses/be/nc-news).
+
+## Setting up the enviroment variables:
 
 
+Since .env.* files are ignored and not tracked in the repository, you must create them manually to run the project locally.
 
---- 
 
-This portfolio project was created as part of a Digital Skills Bootcamp in Software Engineering provided by [Northcoders](https://northcoders.com/)
+1. Install the `dotenv` package:
+   ```bash
+   npm install dotenv
+   ```
+
+2. Create a `.env` file in the root of the project directory and set the `PGDATABASE` environment variable to the desired database name (see setup.sql file):
+   ```env
+   PGDATABASE=nc_news
+   ```
+
+3. Run the application locally:
+   ```bash
+   npm start
+   ```

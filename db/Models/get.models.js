@@ -1,13 +1,17 @@
-// const db = require("../connection")
+const db = require("../connection")
 
 
-// function fetchEndPoints (){
-//     console.log(req)
+function fetchTopics (){
+    return db.query("SELECT * FROM topics")
+    .then((res)=>{
+        return res.rows
+    })
     
-// }
+    
+}
 
 
 
 
 
-// module.exports = {fetchEndPoints}
+module.exports = {fetchTopics}

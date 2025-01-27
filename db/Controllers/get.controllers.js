@@ -1,16 +1,20 @@
-// const app = require("../app")
-// const {fetchEndPoints} = require("../Models/get.models")
+const app = require("../app")
+const {fetchTopics} = require("../Models/get.models")
 
 
-// function getEndPoints (req, res){
-//     console.log(req)
-//     fetchEndPoints().then((endpoints)=>{
-//         res.status(200).send({endpoints})
-//     })
-// }
+function getTopics (req, res, next){
+        fetchTopics()
+        .then((topics)=>{
+        res.status(200).send({topics})
+         })
+        .catch((err)=>{
+        next(err)
+         })
+}
 
 
 
 
 
-// module.exports = {getEndPoints}
+
+module.exports = {getTopics}

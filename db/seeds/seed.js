@@ -5,6 +5,7 @@ const {
   createRef,
   formatComments,
 } = require('./utils');
+const index = require('../data/development-data/index');
 
 const seed = ({ topicData, userData, articleData, commentData }) => {
   return db

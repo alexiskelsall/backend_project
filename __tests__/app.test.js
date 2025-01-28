@@ -49,19 +49,19 @@ describe("404", ()=>{
     .get("/api/incorrectpath")
     .expect(404)
     .then((res)=>{
-      expect(res.body.error).toBe("Endpoint not found")
+      expect(res.body.message).toBe("Endpoint not found")
     })
   })
 })
 
 describe.only("GET /api/articles/:article_id", () => {
-  test.skip("200: Responds with the correct article", () => {
+  test.only("200: Responds with the correct article", () => {
     return request(app)
       .get("/api/articles/1")
       .expect(200)
       .then(({body}) => {
-       const article_id = body.article_id
-       expect(article_id).toEqual(   {
+       const article = body.article
+        expect(article).toEqual( [{
         article_id: 1,
         title: 'Living in the shadow of a great man',
         topic: 'mitch',
@@ -70,7 +70,7 @@ describe.only("GET /api/articles/:article_id", () => {
         created_at: '2020-07-09T20:11:00.000Z',
         votes: 100,
         article_img_url: 'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700'
-      })
+      }])
         
       });
   });

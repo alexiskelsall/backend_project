@@ -4,7 +4,11 @@ const db = require("../connection")
 function fetchTopics (){
     return db.query("SELECT * FROM topics")
     .then((res)=>{
-        return res.rows
+        if(res.rows.length === 0){
+            return Promise.reject({status: 204, message: "No Content"})
+        } else {
+            return res.rows
+        }
     })
 }
 
@@ -16,7 +20,7 @@ function fetchArticleByID (id){
         if(rows.length === 0){
             return Promise.reject({message: "Article Not Found"})
         } else {
-            return res.rows[0]
+            return rows
         }
               
     })

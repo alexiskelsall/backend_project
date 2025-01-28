@@ -1,9 +1,7 @@
 const express = require("express")
 const app = express ()
 const endpoints = require("../endpoints.json");
-const {getTopics, getArticleByID} = require("./Controllers/get.controllers")
-
-app.use(express.json())
+const {getTopics, getArticles, getArticleByID} = require("./Controllers/get.controllers")
 
 app.get('/api', (req, res)=>{
     res.status(200).send({endpoints})
@@ -12,15 +10,26 @@ app.get('/api', (req, res)=>{
 
 app.get('/api/topics', getTopics)
 
+app.get('/api/articles', getArticles)
+
 app.get('/api/articles/:article_id', getArticleByID)
 
 app.all("*",(req, res)=>{
-    res.status(404).send({error:"Endpoint not found"})
+    res.status(404).send({message:"Endpoint not found"})
 })
 
 app.use((err,req,res,next)=>{
     if(err.code === "22P02"){
         res.status(400).send({error: "Bad Request"})
+    } else {
+        next(err)
+    }
+    }
+)
+
+app.use((err,req,res,next)=>{
+    if(err.status === 204){
+        res.status(204).send({error: "No Content"})
     } else {
         next(err)
     }
@@ -43,4 +52,3 @@ app.use((err,req,res,next)=>{
 })
 
 module.exports = app
-

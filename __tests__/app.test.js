@@ -4,6 +4,8 @@ const app = require("../db/app");
 const connection = require("../db/connection")
 const testData = require("../db/data/test-data/index")
 const seed = require("../db/seeds/seed")
+require("jest-sorted")
+
 
 
 beforeEach(()=> {return seed(testData)}) 
@@ -49,19 +51,61 @@ describe("404", ()=>{
     .get("/api/incorrectpath")
     .expect(404)
     .then((res)=>{
-      expect(res.body.error).toBe("Endpoint not found")
+      expect(res.body.message).toBe("Endpoint not found")
     })
   })
 })
 
-describe.only("GET /api/articles/:article_id", () => {
-  test.skip("200: Responds with the correct article", () => {
+describe("GET /api/articles", () => {
+  test("200: Responds with an array of article objects in date descending order", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({body:{articles}}) => {
+          expect(Array.isArray(articles)).toBe(true)
+          expect(articles).toBeSortedBy("created_at", {descending: true})
+          expect(articles).toHaveLength(13)
+        })
+      });
+  test("200: Responds with the following properties: author,title, article_id, topic, created_at, votes, article_img_url, comment_count", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({body:{articles}}) => {
+        articles.forEach((article)=>{
+           expect(article).not.toHaveProperty("body")
+           expect(article).toHaveProperty("comment_count")
+           expect(article).toHaveProperty("article_id")
+           expect(article).toHaveProperty("title")
+           expect(article).toHaveProperty("author")
+           expect(article).toHaveProperty("created_at")
+           expect(article).toHaveProperty("article_img_url")
+           expect(article).toHaveProperty("topic")
+           expect(article).toHaveProperty("votes")
+           })
+           });
+      });
+    test("200: Responds with the correct comment count for articles",()=>{
+      return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({body:{articles}}) => {
+        expect(articles[0].comment_count).toBe("2")
+        expect(articles[3].comment_count).toBe("0")
+        expect(articles[5].comment_count).toBe("2")
+    })  
+  
+  
+    })
+
+describe("GET /api/articles/:article_id", () => {
+  test("200: Responds with the correct article", () => {
     return request(app)
       .get("/api/articles/1")
       .expect(200)
       .then(({body}) => {
-       const article_id = body.article_id
-       expect(article_id).toEqual(   {
+       const article = body.article
+        expect(article).toEqual( [{
         article_id: 1,
         title: 'Living in the shadow of a great man',
         topic: 'mitch',
@@ -70,7 +114,7 @@ describe.only("GET /api/articles/:article_id", () => {
         created_at: '2020-07-09T20:11:00.000Z',
         votes: 100,
         article_img_url: 'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700'
-      })
+      }])
         
       });
   });
@@ -95,4 +139,4 @@ describe.only("GET /api/articles/:article_id", () => {
       });
   });
 });
-
+})

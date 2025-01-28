@@ -94,9 +94,7 @@ describe("GET /api/articles", () => {
         expect(articles[3].comment_count).toBe("0")
         expect(articles[5].comment_count).toBe("2")
     })  
-  
-  
-    })
+  })
 
 describe("GET /api/articles/:article_id", () => {
   test("200: Responds with the correct article", () => {
@@ -115,11 +113,11 @@ describe("GET /api/articles/:article_id", () => {
         votes: 100,
         article_img_url: 'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700'
       }])
-        
       });
   });
+})
 
-  test("404: Responds with a 404 message of 'Not Found", () => {
+  test("404: Responds with a 404 message if ID not found", () => {
     return request(app)
       .get("/api/articles/9999")
       .expect(404)
@@ -128,7 +126,6 @@ describe("GET /api/articles/:article_id", () => {
         
       });
   });
-
   test("400: ID not a number", () => {
     return request(app)
       .get("/api/articles/coding")
@@ -138,5 +135,48 @@ describe("GET /api/articles/:article_id", () => {
         
       });
   });
-});
 })
+
+describe("GET /api/articles/:article_id/comments", () => {
+  test("200: Responds with an array of comments for the given article_id", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then(({ body: { comments } }) => {
+        expect(comments).toHaveLength(11);
+        comments.forEach((comment) => {
+          expect(comment).toHaveProperty("comment_id");
+          expect(comment).toHaveProperty("votes");
+          expect(comment).toHaveProperty("created_at");
+          expect(comment).toHaveProperty("author");
+          expect(comment).toHaveProperty("body");
+          expect(comment).toHaveProperty("article_id");
+        });
+      });
+  });
+  test("200: Responds with the most recent comments first", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then(({ body: { comments } }) => {
+        expect(comments).toBeSortedBy("created_at", { descending: true });
+      });
+  });
+  test("400: ID not a number", () => {
+    return request(app)
+      .get("/api/articles/invalid/comments")
+      .expect(400)
+      .then((res) => {
+        expect(res.body.error).toBe("Bad Request");
+      });
+  });
+  test("404: Responds with a 404 message if ID not found", () => {
+    return request(app)
+      .get("/api/articles/9999/comments")
+      .expect(404)
+      .then((res) => {
+        expect(res.body.error).toBe("Not Found");
+      });
+  });
+});
+

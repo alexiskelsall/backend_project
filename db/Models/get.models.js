@@ -47,8 +47,22 @@ function fetchArticleByID (id){
     })
 }
 
+function fetchArticleCommentsByID (id){
+    return db.query(`
+        SELECT * FROM comments
+        WHERE article_id = $1 
+        ORDER BY created_at DESC`, [id])
+    .then(({rows})=>{
+        if(rows.length === 0){
+            return Promise.reject({message: "Comments Not Found"})
+        }
+        return rows
+        })
+    
+}
 
 
 
 
-module.exports = {fetchTopics, fetchArticles, fetchArticleByID}
+
+module.exports = {fetchTopics, fetchArticles, fetchArticleByID, fetchArticleCommentsByID}

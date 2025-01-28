@@ -4,6 +4,8 @@ const app = require("../db/app");
 const connection = require("../db/connection")
 const testData = require("../db/data/test-data/index")
 const seed = require("../db/seeds/seed")
+require("jest-sorted")
+
 
 
 beforeEach(()=> {return seed(testData)}) 
@@ -54,8 +56,50 @@ describe("404", ()=>{
   })
 })
 
-describe.only("GET /api/articles/:article_id", () => {
-  test.only("200: Responds with the correct article", () => {
+describe("GET /api/articles", () => {
+  test("200: Responds with an array of article objects in date descending order", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({body:{articles}}) => {
+          expect(Array.isArray(articles)).toBe(true)
+          expect(articles).toBeSortedBy("created_at", {descending: true})
+          expect(articles).toHaveLength(13)
+        })
+      });
+  test("200: Responds with the following properties: author,title, article_id, topic, created_at, votes, article_img_url, comment_count", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({body:{articles}}) => {
+        articles.forEach((article)=>{
+           expect(article).not.toHaveProperty("body")
+           expect(article).toHaveProperty("comment_count")
+           expect(article).toHaveProperty("article_id")
+           expect(article).toHaveProperty("title")
+           expect(article).toHaveProperty("author")
+           expect(article).toHaveProperty("created_at")
+           expect(article).toHaveProperty("article_img_url")
+           expect(article).toHaveProperty("topic")
+           expect(article).toHaveProperty("votes")
+           })
+           });
+      });
+    test("200: Responds with the correct comment count for articles",()=>{
+      return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({body:{articles}}) => {
+        expect(articles[0].comment_count).toBe("2")
+        expect(articles[3].comment_count).toBe("0")
+        expect(articles[5].comment_count).toBe("2")
+    })  
+  
+  
+    })
+
+describe("GET /api/articles/:article_id", () => {
+  test("200: Responds with the correct article", () => {
     return request(app)
       .get("/api/articles/1")
       .expect(200)
@@ -95,4 +139,4 @@ describe.only("GET /api/articles/:article_id", () => {
       });
   });
 });
-
+})

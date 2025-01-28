@@ -1,14 +1,16 @@
 const express = require("express")
 const app = express ()
 const endpoints = require("../endpoints.json");
-const {getTopics, getArticleByID} = require("./Controllers/get.controllers")
 
+const {getTopics, getArticles, getArticleByID} = require("./Controllers/get.controllers")
 app.get('/api', (req, res)=>{
     res.status(200).send({endpoints})
 })
 
 
 app.get('/api/topics', getTopics)
+
+app.get('/api/articles', getArticles)
 
 app.get('/api/articles/:article_id', getArticleByID)
 
@@ -50,4 +52,3 @@ app.use((err,req,res,next)=>{
 })
 
 module.exports = app
-

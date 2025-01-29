@@ -4,6 +4,7 @@ const {
   formatComments,
 } = require("../db/seeds/utils");
 const {addComment, checkUsername, isString} = require("../db/Models/post.models")
+const {removeCommentByID, validCommentID} = require("../db/Models/delete.models")
 
 describe.skip("convertTimestampToDate", () => {
   test("returns a new object", () => {
@@ -104,7 +105,7 @@ describe("formatComments", () => {
   });
 });
 
-describe.only("checkUsername",()=>{
+describe("checkUsername",()=>{
   test("should reject if the username does not exist", ()=>{
     return expect (checkUsername("John123")).rejects.toEqual({
       status: 404,
@@ -116,7 +117,7 @@ describe.only("checkUsername",()=>{
   })
 })
 
-describe.only("isString",()=>{
+describe("isString",()=>{
   test("should reject if the values are not strings", ()=>{
     return expect (isString({body: 211654, username: 113564, article_id: 46546})).rejects.toEqual({
       status: 400,
@@ -125,5 +126,17 @@ describe.only("isString",()=>{
   })
   test("should resolve if the values are strings", ()=>{
     return expect (isString({body: 'I really enjoyed this book', username: 'rogersop', article_id: '1'})).resolves.toEqual({body: 'I really enjoyed this book', username: 'rogersop', article_id: '1'})
+  })
+})
+
+describe.only("validCommentID",()=>{
+  test("should reject if the comment ID does not exist", ()=>{
+    return expect (validCommentID(9999)).rejects.toEqual({
+      status: 404,
+      message: "Comment ID Not Found"
+    })
+  })
+  test("should resolve if the comment id exists", ()=>{
+    return expect (validCommentID(1)).resolves.toBeUndefined()
   })
 })

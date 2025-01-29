@@ -181,7 +181,7 @@ describe("GET /api/articles/:article_id/comments", () => {
 });
 
 describe.only("POST /api/articles/:article_id/comments", () => {
-  test.skip("201: Responds with a posted comment", () => {
+  test("201: Responds with a posted comment", () => {
     return request(app)
       .post("/api/articles/1/comments")
       .send({ username: "lurker", body: "I really enjoyed this book" })
@@ -208,7 +208,7 @@ describe.only("POST /api/articles/:article_id/comments", () => {
       expect(res.body.error).toBe("Not Found");
     });
   })
-  test.skip("400: Username and body values are not strings",()=>{
+  test("400: Username and body values are not strings",()=>{
     return request(app)
     .post("/api/articles/2/comments")
     .send({ username: 31516, body: 1234 })

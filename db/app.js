@@ -26,7 +26,7 @@ app.all("*",(req, res)=>{
 })
 
 app.use((err,req,res,next)=>{
-    if(err.code === "22P02"){
+    if(err.code === "22P02" || err.message === "Not a Valid Input"){
         res.status(400).send({error: "Bad Request"})
     } else {
         next(err)
@@ -49,7 +49,6 @@ app.use((err,req,res,next)=>{
         } else {
             next(err)
         }
-    
 })
 
 

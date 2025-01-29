@@ -61,8 +61,16 @@ function fetchArticleCommentsByID (id){
     
 }
 
+function fetchUsers(){
+    return db.query(`
+        SELECT * FROM users`)
+    .then(({rows})=>{
+        return rows
+    })
+}
 
 
 
 
-module.exports = {fetchTopics, fetchArticles, fetchArticleByID, fetchArticleCommentsByID}
+
+module.exports = {fetchTopics, fetchArticles, fetchArticleByID, fetchArticleCommentsByID, fetchUsers}

@@ -84,10 +84,25 @@
     "votes": 105,
     "article_img_url": "https://example.com/article_image.png"
   }
-},
+  },
   "DELETE /api/comments/:comment_id":{
     "description": "Deletes a specific comment by comment_id and no content ",
     "queries": [],
     "exampleResponse": {}
+  },
+"GET /api/users": {
+  "description": "Serves an array of all users",
+  "queries": [],
+  "exampleResponse": {
+    "topics": [
+      {
+        "username": "JoeDev123",
+        "name": "Joe",
+        "avatar_url": "https://example.com/placeholder-user.png"
+      }
+    ]
+   }
   }
 }
+
+

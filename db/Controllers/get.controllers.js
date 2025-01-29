@@ -1,5 +1,5 @@
 const app = require("../app")
-const {fetchTopics, fetchArticles, fetchArticleByID, fetchArticleCommentsByID} = require("../Models/get.models")
+const {fetchTopics, fetchArticles, fetchArticleByID, fetchArticleCommentsByID, fetchUsers} = require("../Models/get.models")
 
 
 function getTopics (req, res, next){
@@ -45,6 +45,15 @@ function getArticleCommentsByID (req, res, next){
     })
 }
 
+function getUsers(req, res, next){
+    fetchUsers()
+    .then((users)=>
+    res.status(200).send({users}))
+    .catch((err)=>{
+        next(err)
+    })
+}
 
 
-module.exports = {getTopics, getArticles, getArticleByID, getArticleCommentsByID}
+
+module.exports = {getTopics, getArticles, getArticleByID, getArticleCommentsByID, getUsers}

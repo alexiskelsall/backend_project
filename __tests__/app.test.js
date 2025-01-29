@@ -281,7 +281,7 @@ test("400: Responds with a 400 if nothing is sent", () => {
 });
 });
 
-describe.only("DELETE /api/comments/:comment_id",()=>{
+describe("DELETE /api/comments/:comment_id",()=>{
   test("204: Responds with a 204 and no content",()=>{
     return request(app)
     .delete("/api/comments/2")
@@ -314,4 +314,27 @@ describe.only("DELETE /api/comments/:comment_id",()=>{
     })
    })
 })
+
+describe.only("GET /api/users", () => {
+  test("200: Responds with an array of user objects", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then(({body:{users}}) => {
+          expect(Array.isArray(users)).toBe(true)
+        })
+      });
+  test("200: Responds with 'username', 'name', 'avatar_url'as properties", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then(({body:{users}}) => {
+          users.forEach((user)=>{
+          expect(user).toHaveProperty("username")
+          expect(user).toHaveProperty("name")
+          expect(user).toHaveProperty("avatar_url")
+        })
+      });
+  });
+});
 

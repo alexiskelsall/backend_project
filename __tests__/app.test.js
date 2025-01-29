@@ -180,7 +180,7 @@ describe("GET /api/articles/:article_id/comments", () => {
   });
 });
 
-describe.only("POST /api/articles/:article_id/comments", () => {
+describe("POST /api/articles/:article_id/comments", () => {
   test("201: Responds with a posted comment", () => {
     return request(app)
       .post("/api/articles/1/comments")
@@ -217,5 +217,67 @@ describe.only("POST /api/articles/:article_id/comments", () => {
       expect(res.body.error).toBe("Bad Request");
     });
   })
+});
+
+describe.only("PATCH /api/articles/:article_id", () => {
+  test("200: Responds with the updated article", () => {
+    return request(app)
+      .patch("/api/articles/2")
+      .send({ inc_votes: 5 })
+      .expect(200)
+      .then(({ body: { updatedArticle } }) => {
+        expect(updatedArticle[0]).toHaveProperty("votes"); 
+        expect(updatedArticle[0]).toHaveProperty("title"); 
+        expect(updatedArticle[0]).toHaveProperty("topic"); 
+        expect(updatedArticle[0]).toHaveProperty("author"); 
+        expect(updatedArticle[0]).toHaveProperty("body"); 
+        expect(updatedArticle[0]).toHaveProperty("article_id"); 
+        expect(updatedArticle[0]).toHaveProperty("article_img_url"); 
+
+        expect(updatedArticle[0].votes).toBe(5)
+      });
+  });
+  test("200: Works with negative numbers", () => {
+    return request(app)
+      .patch("/api/articles/3")
+      .send({ inc_votes: 4})
+      .then(()=>{
+       return request(app)
+        .patch("/api/articles/3")
+        .send({ inc_votes: -2})
+        .expect(200) 
+      })
+      .then(({ body: { updatedArticle } }) => {
+        expect(updatedArticle[0].votes).toBe(2)
+      });
+  });
+  test("400: Responds with a 400 if number is not an interger", () => {
+    return request(app)
+      .patch("/api/articles/2")
+      .send({ inc_votes: 4.5 })
+      .expect(400)
+      .then((res) => {
+        expect(res.body.error).toBe("Bad Request");
+      });
+  
+});
+test("400: Responds with a 400 if inc_votes is not a number", () => {
+  return request(app)
+    .patch("/api/articles/2")
+    .send({ inc_votes: "hello" })
+    .expect(400)
+    .then((res) => {
+      expect(res.body.error).toBe("Bad Request");
+    });
+});
+test("400: Responds with a 400 if nothing is sent", () => {
+  return request(app)
+    .patch("/api/articles/2")
+    .send({ })
+    .expect(400)
+    .then((res) => {
+      expect(res.body.error).toBe("Bad Request");
+    });
+});
 });
 

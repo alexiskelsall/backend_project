@@ -180,3 +180,42 @@ describe("GET /api/articles/:article_id/comments", () => {
   });
 });
 
+describe.only("POST /api/articles/:article_id/comments", () => {
+  test("201: Responds with a posted comment", () => {
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send({ username: "lurker", body: "I really enjoyed this book" })
+      .expect(201)
+      .then(({ body: { newComment } }) => {
+          expect(newComment[0].author).toBe("lurker")
+          expect(newComment[0].article_id).toBe(1)
+        newComment.forEach((comment) => { 
+          expect(comment).toHaveProperty("comment_id");
+          expect(comment).toHaveProperty("votes");
+          expect(comment).toHaveProperty("created_at");
+          expect(comment).toHaveProperty("author");
+          expect(comment).toHaveProperty("body");
+          expect(comment).toHaveProperty("article_id");
+        });
+      });
+  });
+  test("404: Responds with a 404 message if username is not found",()=>{
+    return request(app)
+    .post("/api/articles/2/comments")
+    .send({ username: "Johnson", body: "Thought provokingly good" })
+    .expect(404)
+    .then((res) => {
+      expect(res.body.error).toBe("Not Found");
+    });
+  })
+  test("400: Username and body values are not strings",()=>{
+    return request(app)
+    .post("/api/articles/2/comments")
+    .send({ username: 31516, body: 1234 })
+    .expect(400)
+    .then((res) => {
+      expect(res.body.error).toBe("Bad Request");
+    });
+  })
+});
+

@@ -3,6 +3,7 @@ const {
   createRef,
   formatComments,
 } = require("../db/seeds/utils");
+const {addComment, checkUsername, isString} = require("../db/Models/post.models")
 
 describe.skip("convertTimestampToDate", () => {
   test("returns a new object", () => {
@@ -102,3 +103,27 @@ describe("formatComments", () => {
     expect(formattedComments[0].created_at).toEqual(new Date(timestamp));
   });
 });
+
+describe.only("checkUsername",()=>{
+  test("should reject if the username does not exist", ()=>{
+    return expect (checkUsername("John123")).rejects.toEqual({
+      status: 404,
+      message: "Username Not Found"
+    })
+  })
+  test("should resolve if the username exists", ()=>{
+    return expect (checkUsername("rogersop")).resolves.toBeUndefined()
+  })
+})
+
+describe.only("isString",()=>{
+  test("should reject if the values are not strings", ()=>{
+    return expect (isString({body: 211654, username: 113564, article_id: 46546})).rejects.toEqual({
+      status: 400,
+      message: "Not a Valid Input"
+    })
+  })
+  test("should resolve if the values are strings", ()=>{
+    return expect (isString({body: 'I really enjoyed this book', username: 'rogersop', article_id: '1'})).resolves.toEqual({body: 'I really enjoyed this book', username: 'rogersop', article_id: '1'})
+  })
+})

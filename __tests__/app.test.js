@@ -219,7 +219,7 @@ describe("POST /api/articles/:article_id/comments", () => {
   })
 });
 
-describe.only("PATCH /api/articles/:article_id", () => {
+describe("PATCH /api/articles/:article_id", () => {
   test("200: Responds with the updated article", () => {
     return request(app)
       .patch("/api/articles/2")
@@ -280,4 +280,38 @@ test("400: Responds with a 400 if nothing is sent", () => {
     });
 });
 });
+
+describe.only("DELETE /api/comments/:comment_id",()=>{
+  test("204: Responds with a 204 and no content",()=>{
+    return request(app)
+    .delete("/api/comments/2")
+    .expect(204)
+    .then(()=>{
+      return connection.query(`
+        SELECT * FROM comments`)
+    })
+    .then(({rows})=>{
+      rows.forEach((comment)=>{
+        expect(comment.comment_id).not.toBe(2)
+      })
+    })
+
+  })
+  test("404: Responds with a 404 message if comment_id is not found",()=>{
+    return request(app)
+    .delete("/api/comments/9999")
+    .expect(404)
+    .then((res)=>{
+      expect(res.body.error).toBe("Not Found")
+    })
+   })
+  test("400: ID not a number",()=>{
+    return request(app)
+    .delete("/api/comments/notanumber")
+    .expect(400)
+    .then((res)=>{
+      expect(res.body.error).toBe("Bad Request")
+    })
+   })
+})
 

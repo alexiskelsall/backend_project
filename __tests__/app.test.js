@@ -111,6 +111,30 @@ describe("GET /api/articles", () => {
         expect(body.articles).toBeSorted({key: "title", descending: true})
       })
   })
+  test("200: Should be able to filter by topic",()=>{
+    return request(app)
+    .get("/api/articles?topic=mitch&sort_by=title&order=desc")
+    .expect(200)
+    .then(({body})=>{
+      expect(body.articles).toHaveLength(12)
+    })
+  })
+  test("200: Should be able to filter by topic",()=>{
+    return request(app)
+    .get("/api/articles?topic=mitch&sort_by=title&order=desc")
+    .expect(200)
+    .then(({body})=>{
+      expect(body.articles).toHaveLength(12)
+    })
+  })
+  test("400: Invalid topic query", ()=>{
+    return request(app)
+      .get("/api/articles?topic=code&sort_by=title&order=desc")
+      .expect(400)
+      .then((res)=>{
+        expect(res.body.error).toBe("Bad Request")
+      })
+  })
   test("400: Invalid sort_by query", ()=>{
     return request(app)
       .get("/api/articles?&sort_by=name")
@@ -219,7 +243,6 @@ describe("POST /api/articles/:article_id/comments", () => {
       .send({ username: "lurker", body: "I really enjoyed this book" })
       .expect(201)
       .then(({ body: { newComment } }) => {
-        console.log(newComment)
           expect(newComment[0].author).toBe("lurker")
           expect(newComment[0].article_id).toBe(1)
           expect(newComment[0].body).toBe("I really enjoyed this book")
@@ -263,13 +286,30 @@ describe("PATCH /api/articles/:article_id", () => {
         expect(updatedArticle.votes).toBe(5)
       });
   });
-  test.only("200: Works with negative numbers", () => {
+  test("200: Works with negative numbers", () => {
     return request(app)
       .patch("/api/articles/3")
       .send({ inc_votes: -4})
       .then(({ body}) => {
         const updatedArticle = body.article
         expect(updatedArticle.votes).toBe(-4)
+      });
+  });
+  test("404: Responds with a 404 message if ID not found", () => {
+    return request(app)
+      .patch("/api/articles/9999")
+      .send({ inc_votes: 5 })
+      .expect(404)
+      .then((res) => {
+       expect(res.body.error).toBe("Not Found")
+      });
+  });
+  test("400: ID not a number", () => {
+    return request(app)
+      .patch("/api/articles/coding")
+      .expect(400)
+      .then((res) => {
+       expect(res.body.error).toBe("Bad Request") 
       });
   });
   test("400: Responds with a 400 if inc_votes is not an interger", () => {
@@ -337,14 +377,6 @@ describe("DELETE /api/comments/:comment_id",()=>{
 })
 
 describe("GET /api/users", () => {
-  test("200: Responds with an array of user objects", () => {
-    return request(app)
-      .get("/api/users")
-      .expect(200)
-      .then(({body:{users}}) => {
-          expect(Array.isArray(users)).toBe(true)
-        })
-      });
   test("200: Responds with 'username', 'name', 'avatar_url'as properties", () => {
     return request(app)
       .get("/api/users")

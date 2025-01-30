@@ -56,10 +56,15 @@ function fetchArticles (sort_by= "created_at", order= "desc"){
 }
 
 function fetchArticleByID (id){
-    return db.query(`
-        SELECT * FROM articles
-        WHERE article_id =$1`, [id])
+    return db.query(
+    `SELECT articles.article_id, articles.author, articles.title, articles.body, articles.topic, articles.created_at, articles.votes, articles.article_img_url, COUNT(comments.article_id) AS comment_count FROM articles 
+    LEFT JOIN comments ON comments.article_id = articles.article_id 
+    WHERE articles.article_id =$1
+    GROUP BY articles.article_id`,
+    [id]
+    )
     .then(({rows})=>{
+        console.log(rows)
         if(rows.length === 0){
             return Promise.reject({message: "Article Not Found"})
         } else {

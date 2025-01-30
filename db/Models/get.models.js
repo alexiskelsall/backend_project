@@ -11,7 +11,7 @@ function fetchTopics (){
         }
     })
 }
-function fetchArticles (sort_by= "created_at", order= "desc"){
+function fetchArticles (sort_by= "created_at", order= "desc", topic){
     let SQLString = `SELECT articles.article_id, articles.title, articles.topic, articles.author, 
     articles.created_at, articles.article_img_url, articles.votes, COUNT(comments.article_id) AS comment_count
     FROM articles
@@ -48,7 +48,11 @@ function fetchArticles (sort_by= "created_at", order= "desc"){
         if(rows.length === 0){
             return Promise.reject({status: 204, message: "No Content"})
         } else {
-            return rows
+            return rows.map((article)=>{
+                return {...article,
+                    comment_count: Number(article.comment_count)
+                }
+            })
         }
               
     })

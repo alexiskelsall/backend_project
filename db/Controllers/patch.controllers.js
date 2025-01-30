@@ -10,7 +10,7 @@ function patchArticleByID (req, res, next){
     votes.article_id = req.params.article_id
     updateArticleByID(votes)
     .then((updatedArticle)=>{
-       res.status(200).send({updatedArticle})
+       res.status(200).send({article: updatedArticle})
     })
     .catch((err)=>{
         next(err)

@@ -10,7 +10,7 @@ function updateArticleByID (votes){
         RETURNING *`,
     [inc_votes, article_id])
     .then(({rows})=>{
-        return rows
+        return rows[0]
     })
     }
 

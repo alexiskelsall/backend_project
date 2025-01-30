@@ -95,6 +95,38 @@ describe("GET /api/articles", () => {
         expect(articles[5].comment_count).toBe("2")
     })  
   })
+  test("200: Should be able to sort by a valid column name in ascending order",()=>{
+    return request(app)
+      .get("/api/articles?&sort_by=author&order=asc")
+      .expect(200)
+      .then(({body})=>{
+        expect(body.articles).toBeSorted({key: "author", ascending: true})
+      })
+  })
+  test("200: Should be able to sort by a valid column name in descending order",()=>{
+    return request(app)
+      .get("/api/articles?&sort_by=title&order=desc")
+      .expect(200)
+      .then(({body})=>{
+        expect(body.articles).toBeSorted({key: "title", descending: true})
+      })
+  })
+  test("400: Invalid sort_by query", ()=>{
+    return request(app)
+      .get("/api/articles?&sort_by=name")
+      .expect(400)
+      .then((res)=>{
+        expect(res.body.error).toBe("Bad Request")
+      })
+  })
+  test("400: Invalid order query", ()=>{
+    return request(app)
+      .get("/api/articles?&sort_by=author&order=toptobottom")
+      .expect(400)
+      .then((res)=>{
+        expect(res.body.error).toBe("Bad Request")
+      })
+  })
 
 describe("GET /api/articles/:article_id", () => {
   test("200: Responds with the correct article", () => {
@@ -315,7 +347,7 @@ describe("DELETE /api/comments/:comment_id",()=>{
    })
 })
 
-describe.only("GET /api/users", () => {
+describe("GET /api/users", () => {
   test("200: Responds with an array of user objects", () => {
     return request(app)
       .get("/api/users")

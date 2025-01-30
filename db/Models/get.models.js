@@ -30,13 +30,19 @@ function fetchArticles (sort_by= "created_at", order= "desc"){
 
     if(validColumnNamesToSortBy.includes(sort_by)){
             SQLString += ` ORDER BY ${sort_by}`
+        } else {
+            return Promise.reject({status: 400, message: "Not a Valid Input"})
         }
-    if (order !== "asc" && order !== "desc") {
-        order = "desc";
-        }
+
+    if(order === "" || order === "desc"){
+        order = "desc"
         SQLString += ` ${order}`
-        
-    console.log(SQLString)
+    } else if (order === "asc"){
+        SQLString += ` ${order}`
+    } else {
+        return Promise.reject({status: 400, message: "Not a Valid Input"})
+    }
+
     return db.query(SQLString)
         .then(({rows})=>{
         if(rows.length === 0){

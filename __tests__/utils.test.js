@@ -5,6 +5,7 @@ const {
 } = require("../db/seeds/utils");
 const {addComment, checkUsername, isString} = require("../db/Models/post.models")
 const {removeCommentByID, validCommentID} = require("../db/Models/delete.models")
+const {fetchTopics, fetchArticles, fetchArticleByID, fetchArticleCommentsByID, fetchUsers, validTopic} = require("../db/Models/get.models")
 
 describe.skip("convertTimestampToDate", () => {
   test("returns a new object", () => {
@@ -129,7 +130,7 @@ describe("isString",()=>{
   })
 })
 
-describe.only("validCommentID",()=>{
+describe("validCommentID",()=>{
   test("should reject if the comment ID does not exist", ()=>{
     return expect (validCommentID(9999)).rejects.toEqual({
       status: 404,
@@ -138,5 +139,20 @@ describe.only("validCommentID",()=>{
   })
   test("should resolve if the comment id exists", ()=>{
     return expect (validCommentID(1)).resolves.toBeUndefined()
+  })
+})
+
+describe("validTopic",()=>{
+  test("should reject if the topic does not exist", ()=>{
+    return expect (validTopic("code")).rejects.toEqual({
+      status: 404,
+      message: "Topic Not Found"
+    })
+  })
+  test("should resolve if the topic exists", ()=>{
+    return expect (validTopic("mitch")).resolves.toEqual("mitch")
+  })
+  test("should resolve if the topic is null", ()=>{
+    return expect (validTopic(null)).resolves.toBeUndefined()
   })
 })

@@ -34,7 +34,7 @@ app.all("*",(req, res)=>{
 })
 
 app.use((err,req,res,next)=>{
-    if(err.code === "22P02" || err.message === "Not a Valid Input"){
+    if(err.code === "22P02" || err.message === "Not a Valid Input" || err.message === "Topic Not Found"){
         res.status(400).send({error: "Bad Request"})
     } else {
         next(err)
@@ -52,7 +52,7 @@ app.use((err,req,res,next)=>{
 )
 
 app.use((err,req,res,next)=>{
-        if(err.message === "Article Not Found" || err.message === "Comments Not Found" || err.message === "Username Not Found" || 'Comment ID Not Found'){
+        if(err.message === "Article Not Found" || err.message === "Comments Not Found" || err.message === "Username Not Found" || err.message ==='Comment ID Not Found' ){
             res.status(404).send({error: "Not Found"})
         } else {
             next(err)

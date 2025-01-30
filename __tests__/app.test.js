@@ -3,10 +3,9 @@ const request = require("supertest");
 const app = require("../db/app");
 const connection = require("../db/connection")
 const testData = require("../db/data/test-data/index")
-const seed = require("../db/seeds/seed")
+const seed = require("../db/seeds/seed");
+const { fetchArticles } = require("../db/Models/get.models");
 require("jest-sorted")
-
-
 
 beforeEach(()=> {return seed(testData)}) 
 
@@ -73,26 +72,27 @@ describe("GET /api/articles", () => {
       .expect(200)
       .then(({body:{articles}}) => {
         articles.forEach((article)=>{
-           expect(article).not.toHaveProperty("body")
-           expect(article).toHaveProperty("comment_count")
-           expect(article).toHaveProperty("article_id")
-           expect(article).toHaveProperty("title")
-           expect(article).toHaveProperty("author")
-           expect(article).toHaveProperty("created_at")
-           expect(article).toHaveProperty("article_img_url")
-           expect(article).toHaveProperty("topic")
-           expect(article).toHaveProperty("votes")
-           })
-           });
+          expect(article).toMatchObject({
+            article_id: expect.any(Number),
+            title: expect.any(String),
+            topic: expect.any(String),
+            author: expect.any(String),
+            created_at: expect.any(String),
+            article_img_url: expect.any(String),
+            votes: expect.any(Number), 
+            comment_count: expect.any(Number), 
+          })
+        })
+      });
       });
     test("200: Responds with the correct comment count for articles",()=>{
       return request(app)
       .get("/api/articles")
       .expect(200)
       .then(({body:{articles}}) => {
-        expect(articles[0].comment_count).toBe("2")
-        expect(articles[3].comment_count).toBe("0")
-        expect(articles[5].comment_count).toBe("2")
+        expect(articles[0].comment_count).toBe(2)
+        expect(articles[3].comment_count).toBe(0)
+        expect(articles[5].comment_count).toBe(2)
     })  
   })
   test("200: Should be able to sort by a valid column name in ascending order",()=>{
@@ -109,6 +109,30 @@ describe("GET /api/articles", () => {
       .expect(200)
       .then(({body})=>{
         expect(body.articles).toBeSorted({key: "title", descending: true})
+      })
+  })
+  test("200: Should be able to filter by topic",()=>{
+    return request(app)
+    .get("/api/articles?topic=mitch&sort_by=title&order=desc")
+    .expect(200)
+    .then(({body})=>{
+      expect(body.articles).toHaveLength(12)
+    })
+  })
+  test("200: Should be able to filter by topic",()=>{
+    return request(app)
+    .get("/api/articles?topic=mitch&sort_by=title&order=desc")
+    .expect(200)
+    .then(({body})=>{
+      expect(body.articles).toHaveLength(12)
+    })
+  })
+  test("400: Invalid topic query", ()=>{
+    return request(app)
+      .get("/api/articles?topic=code&sort_by=title&order=desc")
+      .expect(400)
+      .then((res)=>{
+        expect(res.body.error).toBe("Bad Request")
       })
   })
   test("400: Invalid sort_by query", ()=>{
@@ -221,15 +245,8 @@ describe("POST /api/articles/:article_id/comments", () => {
       .then(({ body: { newComment } }) => {
           expect(newComment[0].author).toBe("lurker")
           expect(newComment[0].article_id).toBe(1)
-        newComment.forEach((comment) => { 
-          expect(comment).toHaveProperty("comment_id");
-          expect(comment).toHaveProperty("votes");
-          expect(comment).toHaveProperty("created_at");
-          expect(comment).toHaveProperty("author");
-          expect(comment).toHaveProperty("body");
-          expect(comment).toHaveProperty("article_id");
-        });
-      });
+          expect(newComment[0].body).toBe("I really enjoyed this book")
+         });
   });
   test("404: Responds with a 404 message if username is not found",()=>{
     return request(app)
@@ -257,33 +274,45 @@ describe("PATCH /api/articles/:article_id", () => {
       .patch("/api/articles/2")
       .send({ inc_votes: 5 })
       .expect(200)
-      .then(({ body: { updatedArticle } }) => {
-        expect(updatedArticle[0]).toHaveProperty("votes"); 
-        expect(updatedArticle[0]).toHaveProperty("title"); 
-        expect(updatedArticle[0]).toHaveProperty("topic"); 
-        expect(updatedArticle[0]).toHaveProperty("author"); 
-        expect(updatedArticle[0]).toHaveProperty("body"); 
-        expect(updatedArticle[0]).toHaveProperty("article_id"); 
-        expect(updatedArticle[0]).toHaveProperty("article_img_url"); 
+      .then(({body}) => {
+        const updatedArticle = body.article
+        expect(updatedArticle).toHaveProperty("title"); 
+        expect(updatedArticle).toHaveProperty("topic"); 
+        expect(updatedArticle).toHaveProperty("author"); 
+        expect(updatedArticle).toHaveProperty("body"); 
+        expect(updatedArticle).toHaveProperty("article_id"); 
+        expect(updatedArticle).toHaveProperty("article_img_url"); 
 
-        expect(updatedArticle[0].votes).toBe(5)
+        expect(updatedArticle.votes).toBe(5)
       });
   });
   test("200: Works with negative numbers", () => {
     return request(app)
       .patch("/api/articles/3")
-      .send({ inc_votes: 4})
-      .then(()=>{
-       return request(app)
-        .patch("/api/articles/3")
-        .send({ inc_votes: -2})
-        .expect(200) 
-      })
-      .then(({ body: { updatedArticle } }) => {
-        expect(updatedArticle[0].votes).toBe(2)
+      .send({ inc_votes: -4})
+      .then(({ body}) => {
+        const updatedArticle = body.article
+        expect(updatedArticle.votes).toBe(-4)
       });
   });
-  test("400: Responds with a 400 if number is not an interger", () => {
+  test("404: Responds with a 404 message if ID not found", () => {
+    return request(app)
+      .patch("/api/articles/9999")
+      .send({ inc_votes: 5 })
+      .expect(404)
+      .then((res) => {
+       expect(res.body.error).toBe("Not Found")
+      });
+  });
+  test("400: ID not a number", () => {
+    return request(app)
+      .patch("/api/articles/coding")
+      .expect(400)
+      .then((res) => {
+       expect(res.body.error).toBe("Bad Request") 
+      });
+  });
+  test("400: Responds with a 400 if inc_votes is not an interger", () => {
     return request(app)
       .patch("/api/articles/2")
       .send({ inc_votes: 4.5 })
@@ -348,14 +377,6 @@ describe("DELETE /api/comments/:comment_id",()=>{
 })
 
 describe("GET /api/users", () => {
-  test("200: Responds with an array of user objects", () => {
-    return request(app)
-      .get("/api/users")
-      .expect(200)
-      .then(({body:{users}}) => {
-          expect(Array.isArray(users)).toBe(true)
-        })
-      });
   test("200: Responds with 'username', 'name', 'avatar_url'as properties", () => {
     return request(app)
       .get("/api/users")

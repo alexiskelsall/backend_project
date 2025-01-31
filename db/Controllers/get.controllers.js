@@ -1,5 +1,5 @@
 const app = require("../app")
-const {fetchTopics, fetchArticles, fetchArticleByID, fetchArticleCommentsByID, fetchUsers, fetchUserByID} = require("../Models/get.models")
+const {fetchTopics, fetchArticles, fetchArticleByID, fetchArticleCommentsByID, fetchUsers, fetchUserByUsername} = require("../Models/get.models")
 
 
 function getTopics (req, res, next){
@@ -57,9 +57,9 @@ function getUsers(req, res, next){
     })
 }
 
-function getUserByID(req, res, next){
+function getUserByUsername(req, res, next){
     const user = req.params.username
-    fetchUserByID(user)
+    fetchUserByUsername(user)
     .then((user)=>
     res.status(200).send({user}))
     .catch((err)=>{
@@ -69,4 +69,4 @@ function getUserByID(req, res, next){
 
 
 
-module.exports = {getTopics, getArticles, getArticleByID, getArticleCommentsByID, getUsers, getUserByID}
+module.exports = {getTopics, getArticles, getArticleByID, getArticleCommentsByID, getUsers, getUserByUsername}

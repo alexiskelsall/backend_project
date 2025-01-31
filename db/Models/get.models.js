@@ -114,7 +114,7 @@ function fetchUsers(){
         })
 }
 
-function fetchUserByID(username){
+function fetchUserByUsername(username){
     if(username === ""){
         return Promise.reject({status: 400, message: "Bad Request"})
     } 
@@ -148,6 +148,6 @@ function validTopic(topic){
 }
 
 
-module.exports = {fetchTopics, fetchArticles, fetchArticleByID, fetchArticleCommentsByID, fetchUsers, validTopic, fetchUserByID}
+module.exports = {fetchTopics, fetchArticles, fetchArticleByID, fetchArticleCommentsByID, fetchUsers, validTopic, fetchUserByUsername}
 
 

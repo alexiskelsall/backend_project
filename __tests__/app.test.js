@@ -4,7 +4,7 @@ const app = require("../db/app");
 const connection = require("../db/connection")
 const testData = require("../db/data/test-data/index")
 const seed = require("../db/seeds/seed");
-const { fetchTopics, fetchArticles, fetchArticleByID, fetchArticleCommentsByID, fetchUsers, validTopic, fetchUserByID } = require("../db/Models/get.models");
+const { fetchTopics, fetchArticles, fetchArticleByID, fetchArticleCommentsByID, fetchUsers, validTopic, fetchUserByUsername } = require("../db/Models/get.models");
 require("jest-sorted")
 
 beforeEach(()=> {return seed(testData)}) 
@@ -440,7 +440,7 @@ describe("GET /api/users/:username",()=>{
         })
       });
   test("400: Responds with a 400 if nothing is sent ", () => {
-    return fetchUserByID("")
+    return fetchUserByUsername("")
       .catch((err)=>{
         expect(err.status).toBe(400)
         expect(err.message).toBe("Bad Request")

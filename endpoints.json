@@ -103,7 +103,16 @@
       }
     ]
    }
+  },
+"GET /api/user/:username": {
+  "description": "Serves a specific user by username",
+  "queries": [],
+  "exampleResponse": {
+      "username": "JoeBloggs123",
+      "name": "Joey",
+      "avatar_url": "https://example.com/placeholder-user.png"
   }
+}
 }
 
 

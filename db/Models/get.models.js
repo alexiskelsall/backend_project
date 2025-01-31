@@ -114,6 +114,21 @@ function fetchUsers(){
         })
 }
 
+function fetchUserByID(username){
+    if(username === ""){
+        return Promise.reject({status: 400, message: "Bad Request"})
+    } 
+    return db.query(`
+        SELECT * FROM users
+        WHERE username = $1`, [username])
+        .then(({rows})=>{
+            if(rows.length === 0){
+                return Promise.reject({status: 404, message: "Username Not Found"})
+            } else {
+                return rows[0]
+            }
+        })
+}
 
 function validTopic(topic){
     if(!topic){
@@ -133,6 +148,6 @@ function validTopic(topic){
 }
 
 
-module.exports = {fetchTopics, fetchArticles, fetchArticleByID, fetchArticleCommentsByID, fetchUsers, validTopic}
+module.exports = {fetchTopics, fetchArticles, fetchArticleByID, fetchArticleCommentsByID, fetchUsers, validTopic, fetchUserByID}
 
 

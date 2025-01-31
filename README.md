@@ -68,6 +68,7 @@ npm test app.test.js
 | **GET**     | `/api`                                       | Returns all available API endpoints. |
 | **GET**     | `/api/topics`                                | Retrieves an array of all topics. |
 | **GET**     | `/api/users`                                 | Retrieves an array of all users. |
+| **GET**     | `/api/users/:username`                       | Retrieves a specific user by `username`.|
 | **GET**     | `/api/articles`                              | Retrieves an array of all articles. Supports sorting and filtering. |
 | **GET**     | `/api/articles/:article_id`                  | Retrieves a specific article by `article_id`, including comment count. |
 | **GET**     | `/api/articles/:article_id/comments`         | Retrieves all comments for a specific article. |

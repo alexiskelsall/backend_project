@@ -4,7 +4,7 @@ const app = require("../db/app");
 const connection = require("../db/connection")
 const testData = require("../db/data/test-data/index")
 const seed = require("../db/seeds/seed");
-const { fetchArticles } = require("../db/Models/get.models");
+const { fetchTopics, fetchArticles, fetchArticleByID, fetchArticleCommentsByID, fetchUsers, validTopic, fetchUserByID } = require("../db/Models/get.models");
 require("jest-sorted")
 
 beforeEach(()=> {return seed(testData)}) 
@@ -418,3 +418,32 @@ describe("GET /api/users", () => {
   });
 });
 
+describe("GET /api/users/:username",()=>{
+  test("200: Responds with a user by username", () => {
+    return request(app)
+      .get("/api/users/lurker")
+      .expect(200)
+      .then(({body:{user}}) => {
+          expect(user).toEqual(  {
+            username: 'lurker',
+            name: 'do_nothing',
+            avatar_url: 'https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png'
+          })
+        })
+      });
+  test("404: Responds with 404 if username is not found", () => {
+    return request(app)
+      .get("/api/users/sammy")
+      .expect(404)
+      .then(({body: {error}}) => {
+          expect(error).toBe("Not Found")
+        })
+      });
+  test("400: Responds with a 400 if nothing is sent ", () => {
+    return fetchUserByID("")
+      .catch((err)=>{
+        expect(err.status).toBe(400)
+        expect(err.message).toBe("Bad Request")
+      })
+    });
+})

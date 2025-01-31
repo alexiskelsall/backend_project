@@ -111,13 +111,21 @@ describe("GET /api/articles", () => {
         expect(body.articles).toBeSorted({key: "title", descending: true})
       })
   })
-  test("200: Should be able to filter by topic",()=>{
+  test("200: Should be able to sort by a valid column with order set to default",()=>{
     return request(app)
-    .get("/api/articles?topic=mitch&sort_by=title&order=desc")
-    .expect(200)
-    .then(({body})=>{
-      expect(body.articles).toHaveLength(12)
-    })
+      .get("/api/articles?&sort_by=title")
+      .expect(200)
+      .then(({body})=>{
+        expect(body.articles).toBeSorted({key: "title", descending: true})
+      })
+  })
+  test("200: Should be able to order by asc with soty_by set to default",()=>{
+    return request(app)
+      .get("/api/articles?order=asc")
+      .expect(200)
+      .then(({body})=>{
+        expect(body.articles).toBeSorted({key: "created_at", ascending: true})
+      })
   })
   test("200: Should be able to filter by topic",()=>{
     return request(app)
@@ -127,12 +135,28 @@ describe("GET /api/articles", () => {
       expect(body.articles).toHaveLength(12)
     })
   })
-  test("400: Invalid topic query", ()=>{
+  test("200: Should be able to filter by topic",()=>{
+    return request(app)
+    .get("/api/articles?topic=mitch&sort_by=title&order=desc")
+    .expect(200)
+    .then(({body})=>{
+      expect(body.articles).toHaveLength(12)
+    })
+  })
+  test("200: Responds with an empty array when no articles are associated with a valid topic", ()=>{
+    return request(app)
+      .get("/api/articles?topic=paper")
+      .expect(200)
+      .then(({body: {articles}})=>{
+        expect(articles).toEqual([])
+      })
+  })
+  test("404: Invalid topic query", ()=>{
     return request(app)
       .get("/api/articles?topic=code&sort_by=title&order=desc")
-      .expect(400)
+      .expect(404)
       .then((res)=>{
-        expect(res.body.error).toBe("Bad Request")
+        expect(res.body.error).toBe("Not Found")
       })
   })
   test("400: Invalid sort_by query", ()=>{
@@ -151,15 +175,14 @@ describe("GET /api/articles", () => {
         expect(res.body.error).toBe("Bad Request")
       })
   })
-
-describe.skip("GET /api/articles/:article_id", () => {
-  test.only("200: Responds with the correct article", () => {
+})
+describe("GET /api/articles/:article_id", () => {
+  test("200: Responds with the correct article", () => {
     return request(app)
       .get("/api/articles/1")
       .expect(200)
       .then(({body}) => {
        const article = body.article
-       console.log(article)
         expect(article).toEqual( [{
         article_id: 1,
         title: 'Living in the shadow of a great man',
@@ -169,13 +192,10 @@ describe.skip("GET /api/articles/:article_id", () => {
         created_at: '2020-07-09T20:11:00.000Z',
         votes: 100,
         article_img_url: 'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700',
-        
-          
+        comment_count: 11         
       }])
       });
   });
-})
-
   test("404: Responds with a 404 message if ID not found", () => {
     return request(app)
       .get("/api/articles/9999")
@@ -195,6 +215,10 @@ describe.skip("GET /api/articles/:article_id", () => {
       });
   });
 })
+
+
+
+
 
 describe("GET /api/articles/:article_id/comments", () => {
   test("200: Responds with an array of comments for the given article_id", () => {

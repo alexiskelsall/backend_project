@@ -32,7 +32,7 @@ function fetchArticles(sort_by = "created_at", order = "desc", topic = null) {
                 "created_at",
                 "votes",
                 "article_img_url",
-                "comments",
+                "comment_count",
             ];
 
             if (topic) {
